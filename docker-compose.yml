@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: mediops-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - TWILIO_SID=${TWILIO_SID}
+      - TWILIO_TOKEN=${TWILIO_TOKEN}
+      - TWILIO_PHONE=${TWILIO_PHONE}
+      - ALERT_PHONE=${ALERT_PHONE}
+      - SLACK_WEBHOOK=${SLACK_WEBHOOK}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: postgres:15
+    container_name: mediops-db
+    environment:
+      POSTGRES_DB: mediops
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+  prometheus:
+    image: prom/prometheus
+    container_name: mediops-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/alert-rules.yml:/etc/prometheus/alert-rules.yml
+    ports:
+      - "9090:9090"
+    restart: always
+
+  grafana:
+    image: grafana/grafana
+    container_name: mediops-grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: mediops-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  pgdata:
+  grafana-data:
