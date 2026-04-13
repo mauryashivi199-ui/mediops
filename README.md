@@ -53,6 +53,6 @@ mediops/
 └── docker-compose.yml
 ```
 
-## 👩‍💻 Team
+## 👩‍💻 
 - **Shivangi Maurya** — DevOps Engineer (MGIMT Lucknow)
-- **Ashmi Kushwaha** — Full Stack Developer
+  
